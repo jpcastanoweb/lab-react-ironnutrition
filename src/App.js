@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import 'bulma/css/bulma.css';
 import './App.css';
 import foods from './foods.json';
-import nanoid from 'nanoid';
 
 import FoodBox from './components/FoodBox';
 
@@ -19,6 +18,8 @@ function App() {
     image: '',
     quantity: null,
   });
+
+  const [selectedFoods, setSelectedFoods] = useState([]);
 
   const [error, setError] = useState(null);
   // CRUD
@@ -39,22 +40,6 @@ function App() {
       [event.target.name]: event.target.value,
     });
   };
-
-  // const handleSearchChange = (event) => {
-  //   event.preventDefault();
-
-  //   setSearchString(event.target.value);
-
-  //   console.log(searchString);
-  //   // intenta dividirlo en dos funciones, una cambia el texto del form y la otra filtra la lista
-  //   // setFoodList(foods);
-
-  //   // const filteredList = foods.filter((food) => {
-  //   //   return food.name.includes(searchString);
-  //   // });
-
-  //   // setFoodList(filteredList);
-  // };
 
   const addNewFood = (event) => {
     event.preventDefault();
@@ -98,6 +83,33 @@ function App() {
       image: '',
     });
     setAdd(false);
+  };
+
+  const handlePlusButton = (food, quantity, event) => {
+    event.preventDefault();
+
+    if (quantity > 0) {
+      setSelectedFoods([
+        ...selectedFoods,
+        {
+          name: food.name,
+          calories: food.calories * quantity,
+          quantity,
+        },
+      ]);
+    }
+  };
+
+  const getTotalCalories = () => {
+    // return selectedFoods.reduce((sum, food) => {
+    //   return sum + food.calories;
+    // });
+
+    let sum = 0;
+    for (let i = 0; i < selectedFoods.length; i++) {
+      sum += selectedFoods[i].calories;
+    }
+    return sum;
   };
 
   return (
@@ -173,16 +185,31 @@ function App() {
             <></>
           )}
         </div>
-        <div className="column">
-          {foodList
-            .filter((food) => {
-              return food.name.includes(searchString);
-            })
-            .map((food) => {
-              return <FoodBox food={food}></FoodBox>;
-            })}
+        <div className="columns">
+          <div className="column">
+            {foodList
+              .filter((food) => {
+                return food.name.includes(searchString);
+              })
+              .map((food) => {
+                return <FoodBox food={food} func={handlePlusButton}></FoodBox>;
+              })}
+          </div>
+          <div className="column">
+            <h1>Today's Food</h1>
+            <ul>
+              {selectedFoods.map((food) => {
+                return (
+                  <li>
+                    {food.quantity} {food.name} = {food.calories} cal
+                  </li>
+                );
+              })}
+            </ul>
+
+            <p>Total: {getTotalCalories()}</p>
+          </div>
         </div>
-        <div className="column"></div>
       </div>
     </div>
   );

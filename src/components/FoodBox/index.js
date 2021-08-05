@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './style.css';
 
 export default function FoodBox(props) {
+  const [quantity, setQuantity] = useState(0);
+
+  const handleChange = (e) => {
+    e.preventDefault();
+
+    setQuantity(e.target.value);
+  };
   return (
     <div className="box">
       <article className="media">
@@ -24,11 +31,21 @@ export default function FoodBox(props) {
               <input
                 className="input"
                 type="number"
-                value={props.food.quantity}
+                value={quantity}
+                onChange={(e) => {
+                  handleChange(e);
+                }}
               />
             </div>
             <div className="control">
-              <button className="button is-info">+</button>
+              <button
+                className="button is-info"
+                onClick={(e) => {
+                  props.func(props.food, quantity, e);
+                }}
+              >
+                +
+              </button>
             </div>
           </div>
         </div>
